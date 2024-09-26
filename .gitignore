@@ -1,21 +1,39 @@
-.gradle
-**/build/
-!src/**/build/
+# Gradle 관련
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!build/libs/
 
-# Ignore Gradle GUI config
-gradle-app.setting
+# IntelliJ IDEA 관련
+.idea/
+*.iml
+*.iws
+.idea_modules/
+*.ipr
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+# 로그 파일
+*.log
 
-# Avoid ignore Gradle wrappper properties
-!gradle-wrapper.properties
+# 운영체제 관련
+.DS_Store
+Thumbs.db
 
-# Cache of project
-.gradletasknamecache
+# 환경 변수 파일
+src/main/resources/.env
 
-# Eclipse Gradle plugin generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Spring Boot 관련
+/hs_err_pid*
+/*.hprof
+*.swp
+.swp
+
+# 임시 파일
+*.tmp
+*.bak
+*.swo
+
+
+
+
+
+
