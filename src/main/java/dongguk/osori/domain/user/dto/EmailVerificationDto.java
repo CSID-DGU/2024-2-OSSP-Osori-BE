@@ -5,11 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class SignupUserDto {
-    private String nickname;
+@AllArgsConstructor
+public class EmailVerificationDto {
     private String email;
-    private String password;
-    private String authCode;
+    private String code;
 }
