@@ -32,6 +32,8 @@ src/main/resources/.env
 *.bak
 *.swo
 
+src/main/resources/application.properties
+
 
 
 
