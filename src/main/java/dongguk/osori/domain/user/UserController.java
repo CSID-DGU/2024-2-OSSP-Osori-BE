@@ -1,9 +1,8 @@
 package dongguk.osori.domain.user;
 
-import dongguk.osori.domain.user.dto.EmailVerificationDto;
-import dongguk.osori.domain.user.dto.LoginRequestDto;
-import dongguk.osori.domain.user.dto.SignupUserDto;
-import dongguk.osori.domain.user.dto.UserProfileDto;
+import dongguk.osori.domain.user.dto.*;
+import dongguk.osori.domain.user.service.EmailService;
+import dongguk.osori.domain.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,6 @@ public class UserController {
         return ResponseEntity.ok("인증 코드가 이메일로 전송되었습니다.");
     }
 
-
     // 이메일 인증 코드 확인
     @PostMapping("/signup/verify-code")
     public ResponseEntity<String> verifyEmailCode(@RequestBody EmailVerificationDto verificationDto) {
@@ -46,7 +44,6 @@ public class UserController {
             return ResponseEntity.status(400).body("잘못된 인증 코드입니다.");
         }
     }
-
 
     // 회원가입
     @PostMapping("/signup")
@@ -65,7 +62,6 @@ public class UserController {
             return ResponseEntity.status(500).body("서버 에러 발생. 나중에 다시 시도해주세요.");
         }
     }
-
 
     // 유저 프로필 정보 조회
     @GetMapping("/profile")
@@ -96,7 +92,6 @@ public class UserController {
         }
     }
 
-
     // 로그아웃 시 세션 무효화
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpSession session) {
@@ -104,5 +99,83 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    // 유저 프로필 수정
+    @PatchMapping("/profile")
+    public ResponseEntity<String> updateUserProfile(@RequestBody UserProfileEditDto userProfileEditDto, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
 
+        if (userId == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        try {
+            userService.updateUserProfile(userId, userProfileEditDto);
+            return ResponseEntity.ok("프로필 수정이 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error during profile update", e);
+            return ResponseEntity.status(500).body("서버 에러 발생. 나중에 다시 시도해주세요.");
+        }
+    }
+
+
+    // 현재 비밀번호 확인
+    @PostMapping("/verify-password")
+    public ResponseEntity<String> verifyPassword(@RequestBody PasswordDto passwordDto, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        if (passwordDto.getPassword() == null || passwordDto.getPassword().isEmpty()) {
+            return ResponseEntity.status(400).body("비밀번호가 입력되지 않았습니다.");
+        }
+
+        try {
+            boolean isVerified = userService.verifyPassword(userId, passwordDto);
+            if (isVerified) {
+                return ResponseEntity.ok("비밀번호 확인 완료");
+            } else {
+                return ResponseEntity.status(400).body("비밀번호가 올바르지 않습니다.");
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error during password verification", e);
+            return ResponseEntity.status(500).body("서버 에러 발생. 나중에 다시 시도해주세요.");
+        }
+    }
+
+    // 비밀번호 변경
+    @PatchMapping("/password")
+    public ResponseEntity<String> updatePassword(@RequestBody Map<String, String> request, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        String currentPassword = request.get("currentPassword");
+        String newPassword = request.get("newPassword");
+
+        if (currentPassword == null || newPassword == null || currentPassword.isEmpty() || newPassword.isEmpty()) {
+            return ResponseEntity.status(400).body("비밀번호가 올바르게 입력되지 않았습니다.");
+        }
+
+        try {
+            // 현재 비밀번호 확인
+            boolean isVerified = userService.verifyPassword(userId, new PasswordDto(currentPassword));
+            if (!isVerified) {
+                return ResponseEntity.status(400).body("현재 비밀번호가 일치하지 않습니다.");
+            }
+
+            // 비밀번호 변경
+            userService.updatePassword(userId, new PasswordDto(newPassword));
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            log.error("Unexpected error during password update", e);
+            return ResponseEntity.status(500).body("서버 에러 발생. 나중에 다시 시도해주세요.");
+        }
+    }
 }
+

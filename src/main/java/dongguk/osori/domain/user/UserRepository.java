@@ -1,5 +1,6 @@
 package dongguk.osori.domain.user;
 
+import dongguk.osori.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
