@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProfileDto {
+public class UserProfileEditDto {
 
     private String nickname;
-    private String email;
     private String major;
     private int studentNumber;
     private String introduce;
-
 
 }

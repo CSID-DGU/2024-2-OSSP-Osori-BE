@@ -1,4 +1,4 @@
-package dongguk.osori.domain.user;
+package dongguk.osori.domain.user.service;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +37,12 @@ public class EmailService {
             message.setSubject("[Osori] 회원가입을 위한 이메일 인증");
 
             // 이메일 본문
-            String body = "<h1>안녕하세요. Osori입니다.</h1>"
-                    + "<h3>회원가입을 위한 요청하신 인증 번호입니다.</h3>"
-                    + "<div align='center' style='border:1px solid black; font-family:verdana;'>"
-                    + "<h2>회원가입 인증 코드입니다.</h2>"
-                    + "<h1 style='color:blue'>" + authCode + "</h1>"
-                    + "</div>"
-                    + "<br><h3>감사합니다.</h3>";
+            String body = "<h1 style='color:#2c2f33;'>안녕하세요, Osori입니다.</h1>"
+                    + "<h3 style='color:#99aab5;'>회원가입을 위해 요청하신 인증 번호입니다.</h3>"
+                    + "<div align='center' style='border:1px solid #2c2f33; font-family:verdana;'>"
+                    + "<h2 style='color:#2c2f33;'>회원가입 인증 코드입니다.</h2>"
+                    + "<h1 style='color:#7289da'>" + authCode + "</h1>"
+                    + "</div>";
 
             message.setText(body, "UTF-8", "html");
         } catch (Exception e) {

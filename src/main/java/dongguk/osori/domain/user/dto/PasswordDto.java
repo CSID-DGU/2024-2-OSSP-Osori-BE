@@ -7,13 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProfileDto {
-
-    private String nickname;
-    private String email;
-    private String major;
-    private int studentNumber;
-    private String introduce;
-
-
+public class PasswordDto {
+    private String password;
 }
