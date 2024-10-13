@@ -7,5 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class OsoriApplication {
     public static void main(String[] args) {
         SpringApplication.run(OsoriApplication.class, args);
+
     }
 }
