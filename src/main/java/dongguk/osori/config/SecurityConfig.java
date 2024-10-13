@@ -36,7 +36,7 @@ public class SecurityConfig {
                 // 권한 설정
                 .authorizeHttpRequests(authz -> authz
                         // TODO: 이후 권한 추가해서 수정 필요
-                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         //.requestMatchers("/api/users/signup", "/api/users/login", "/api/users/logout").permitAll() // 회원가입, 로그인, 로그아웃은 인증 불필요
                         //.requestMatchers("/api/**").authenticated() // 그 외 /api/**는 인증 필요
                         .anyRequest().permitAll() // 그 외 모든 요청은 허용

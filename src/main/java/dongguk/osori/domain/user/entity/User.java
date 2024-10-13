@@ -1,7 +1,12 @@
 package dongguk.osori.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import dongguk.osori.domain.goal.entity.Goal;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,6 +55,9 @@ public class User {
         this.balance += amount;
     }
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Goal> goals = new ArrayList<>();
 
 
 }

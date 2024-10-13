@@ -84,7 +84,7 @@ public class UserController {
             log.info("로그인 성공, 세션에 userId 저장: {}", userId);
             return ResponseEntity.ok("로그인 성공");
         } catch (IllegalArgumentException e) {
-            log.error("Login failed: {}", e.getMessage());
+            log.error("로그인 실패: {}", e.getMessage());
             return ResponseEntity.status(401).body(e.getMessage());
         } catch (Exception e) {
             log.error("Unexpected error during login", e);

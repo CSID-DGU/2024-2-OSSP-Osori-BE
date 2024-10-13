@@ -1,11 +1,11 @@
 package dongguk.osori.domain.user.service;
 
 import dongguk.osori.domain.user.UserRepository;
+import dongguk.osori.domain.user.dto.UserProfileDto;
+import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.dto.PasswordDto;
 import dongguk.osori.domain.user.dto.SignupUserDto;
-import dongguk.osori.domain.user.dto.UserProfileDto;
 import dongguk.osori.domain.user.dto.UserProfileEditDto;
-import dongguk.osori.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
