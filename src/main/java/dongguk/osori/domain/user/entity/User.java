@@ -1,7 +1,7 @@
 package dongguk.osori.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import dongguk.osori.domain.follow.Follow;
+import dongguk.osori.domain.follow.entity.Follow;
 import dongguk.osori.domain.goal.entity.Goal;
 import jakarta.persistence.*;
 import lombok.*;
