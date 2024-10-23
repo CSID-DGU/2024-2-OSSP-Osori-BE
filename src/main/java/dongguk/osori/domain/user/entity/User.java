@@ -1,6 +1,7 @@
 package dongguk.osori.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import dongguk.osori.domain.follow.Follow;
 import dongguk.osori.domain.goal.entity.Goal;
 import jakarta.persistence.*;
 import lombok.*;
@@ -58,6 +59,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Goal> goals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> following = new ArrayList<>();
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followers = new ArrayList<>();
 
 
 }

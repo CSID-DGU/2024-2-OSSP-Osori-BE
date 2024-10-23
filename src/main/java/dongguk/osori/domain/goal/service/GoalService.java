@@ -1,5 +1,6 @@
-package dongguk.osori.domain.goal;
+package dongguk.osori.domain.goal.service;
 
+import dongguk.osori.domain.goal.GoalRepository;
 import dongguk.osori.domain.goal.dto.GoalCompletionDto;
 import dongguk.osori.domain.goal.dto.GoalDto;
 import dongguk.osori.domain.goal.entity.Goal;

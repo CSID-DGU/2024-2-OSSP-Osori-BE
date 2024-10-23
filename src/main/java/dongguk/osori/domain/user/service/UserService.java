@@ -1,16 +1,16 @@
 package dongguk.osori.domain.user.service;
 
 import dongguk.osori.domain.user.UserRepository;
-import dongguk.osori.domain.user.dto.UserProfileDto;
+import dongguk.osori.domain.user.dto.*;
 import dongguk.osori.domain.user.entity.User;
-import dongguk.osori.domain.user.dto.PasswordDto;
-import dongguk.osori.domain.user.dto.SignupUserDto;
-import dongguk.osori.domain.user.dto.UserProfileEditDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -103,18 +103,24 @@ public class UserService {
     public void updatePassword(Long userId, PasswordDto passwordDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
-        // 입력받은 비밀번호를 암호화
         String encodedPassword = passwordEncoder.encode(passwordDto.getPassword());
-
-        // 암호화된 비밀번호로 업데이트
         user.updatePassword(encodedPassword);
 
-        // 업데이트된 유저 정보를 저장
         userRepository.save(user);
     }
 
+    // 닉네임 검색
+    public List<UserDto> searchUsersByNickname(String nickname) {
+        List<User> users = userRepository.findByNicknameContaining(nickname);
+        return users.stream()
+                .map(user -> new UserDto(user.getUserId(), user.getNickname(), user.getEmail()))
+                .collect(Collectors.toList());
+    }
 
-
-
+    // 이메일 검색
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+    }
 }
+

@@ -33,17 +33,17 @@ public class UserController {
         return ResponseEntity.ok("인증 코드가 이메일로 전송되었습니다.");
     }
 
-    // 이메일 인증 코드 확인
-    @PostMapping("/signup/verify-code")
-    public ResponseEntity<String> verifyEmailCode(@RequestBody EmailVerificationDto verificationDto) {
-        boolean isVerified = emailService.verifyAuthCode(verificationDto.getEmail(), verificationDto.getCode());
-
-        if (isVerified) {
-            return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
-        } else {
-            return ResponseEntity.status(400).body("잘못된 인증 코드입니다.");
-        }
-    }
+//    // 이메일 인증 코드 확인
+//    @PostMapping("/signup/verify-code")
+//    public ResponseEntity<String> verifyEmailCode(@RequestBody EmailVerificationDto verificationDto) {
+//        boolean isVerified = emailService.verifyAuthCode(verificationDto.getEmail(), verificationDto.getCode());
+//
+//        if (isVerified) {
+//            return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
+//        } else {
+//            return ResponseEntity.status(400).body("잘못된 인증 코드입니다.");
+//        }
+//    }
 
     // 회원가입
     @PostMapping("/signup")
