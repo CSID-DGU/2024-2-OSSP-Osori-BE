@@ -4,6 +4,7 @@ import dongguk.osori.domain.follow.dto.BlockFollowerRequestDto;
 import dongguk.osori.domain.follow.dto.FollowDto;
 import dongguk.osori.domain.follow.dto.FollowRequestDto;
 import dongguk.osori.domain.follow.dto.UnfollowRequestDto;
+import dongguk.osori.domain.follow.service.FollowService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;

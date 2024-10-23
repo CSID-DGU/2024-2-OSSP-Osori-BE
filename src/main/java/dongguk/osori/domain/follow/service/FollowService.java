@@ -1,6 +1,8 @@
-package dongguk.osori.domain.follow;
+package dongguk.osori.domain.follow.service;
 
+import dongguk.osori.domain.follow.FollowRepository;
 import dongguk.osori.domain.follow.dto.FollowDto;
+import dongguk.osori.domain.follow.entity.Follow;
 import dongguk.osori.domain.user.UserRepository;
 import dongguk.osori.domain.user.entity.User;
 import jakarta.persistence.EntityNotFoundException;

@@ -1,4 +1,4 @@
-package dongguk.osori.domain.follow;
+package dongguk.osori.domain.follow.entity;
 
 import dongguk.osori.domain.user.entity.User;
 import jakarta.persistence.*;
