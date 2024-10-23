@@ -3,6 +3,7 @@ package dongguk.osori.domain.goal;
 import dongguk.osori.domain.goal.dto.GoalCompletionDto;
 import dongguk.osori.domain.goal.dto.GoalDto;
 import dongguk.osori.domain.goal.entity.Goal;
+import dongguk.osori.domain.goal.service.GoalService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
