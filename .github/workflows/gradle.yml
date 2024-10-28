@@ -1,4 +1,4 @@
-name: 아코밍 server CI/CD
+name: 아코밍 CI/CD
 
 on:
   push:
@@ -7,7 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-docker-image:
+  build:
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,48 +21,35 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
+    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    # Spring Boot 어플리케이션 Build
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
-    # Docker 이미지 Build
-    - name: docker image build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test .
-
-    # DockerHub Login (push 하기 위해)
-    - name: docker login
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-    # Docker hub 로 push
-    - name: Docker Hub push
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
-
-  # 위 과정에서 푸시한 이미지를 ec2에서 풀받아서 실행
-  run-docker-image-on-ec2:
-    needs: build-docker-image
-    runs-on: self-hosted
-
-    steps:
-    - name: docker pull
-      run : sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
-
-    - name: docker stop container
+    # Docker build & Push 
+    - name: Docker build & push to Docker hub
       run: |
-        if [ $(sudo docker ps -a -q -f name=spring-cicd-test) ]; then
-          sudo docker stop spring-cicd-test
-        fi
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/docker-test .
+        docker push ${{ secrets.DOCKER_USERNAME }}/docker-test
 
-    - name: docker run new container
-      run: sudo docker run --rm -it -d -p 80:8080 --name spring-cicd-test ${{ secrets.DOCKERHUB_USERNAME }}/spring-cicd-test
-
-    - name: delete old docker image
-      run: sudo docker system prune -f
+    # EC2 배포
+    - name: Docker image pull & Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+          sudo docker stop $(sudo docker ps -a -q)
+          sudo docker rm $(sudo docker ps --filter 'status=exited' -a -q)
+          sudo docker image prune -a -f
+          sudo docker run -d --restart unless-stopped --log-driver=syslog -p 8080:8080 \
+            -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.RDS_ENDPOINT }}:3306/yourDatabaseName \
+            -e SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }} \
+            -e SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+            ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
