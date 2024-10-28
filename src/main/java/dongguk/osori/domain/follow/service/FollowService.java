@@ -22,14 +22,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
-    // TODO: 나를 팔로잉 하는 목록 만들기
-
-    // 로그인된 사용자의 ID 가져오기
-    private Long getLoggedInUserId() {
-        return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    // 내 팔로잉 목록
+    // 내 팔로잉 목록 조회
     public List<FollowDto> getMyFollowings(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
@@ -41,6 +34,34 @@ public class FollowService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // 내 팔로워 목록 조회
+    public List<FollowDto> getMyFollowers(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return followRepository.findByFollowing(user).stream()
+                .map(f -> new FollowDto(
+                        f.getFollower().getUserId(),
+                        f.getFollower().getNickname(),
+                        f.getFollower().getEmail()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // 팔로워 및 팔로잉 수 조회
+    public int getFollowingCount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return followRepository.findByFollower(user).size();
+    }
+
+    public int getFollowerCount(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        return followRepository.findByFollowing(user).size();
+    }
+
+
 
     @Transactional
     public void followUser(Long userId, Long followingUserId) {
