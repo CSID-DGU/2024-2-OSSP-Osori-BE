@@ -49,7 +49,14 @@ jobs:
           sudo docker rm $(sudo docker ps --filter 'status=exited' -a -q)
           sudo docker image prune -a -f
           sudo docker run -d --restart unless-stopped --log-driver=syslog -p 8080:8080 \
-            -e SPRING_DATASOURCE_URL=jdbc:mysql://${{ secrets.RDS_ENDPOINT }}:3306/yourDatabaseName \
-            -e SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }} \
-            -e SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+            -e DB_URL=${{ secrets.DB_URL }} \
+            -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
+            -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+            -e SMTP_HOST=${{ secrets.SMTP_HOST }} \
+            -e SMTP_PORT=${{ secrets.SMTP_PORT }} \
+            -e SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} \
+            -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
             ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+
