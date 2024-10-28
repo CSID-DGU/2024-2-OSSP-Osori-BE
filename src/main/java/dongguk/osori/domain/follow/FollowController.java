@@ -1,9 +1,6 @@
 package dongguk.osori.domain.follow;
 
-import dongguk.osori.domain.follow.dto.BlockFollowerRequestDto;
-import dongguk.osori.domain.follow.dto.FollowDto;
-import dongguk.osori.domain.follow.dto.FollowRequestDto;
-import dongguk.osori.domain.follow.dto.UnfollowRequestDto;
+import dongguk.osori.domain.follow.dto.*;
 import dongguk.osori.domain.follow.service.FollowService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.service.UserService;
@@ -25,14 +22,30 @@ public class FollowController {
     private final FollowService followService;
     private final UserService userService;
 
-    // 내 팔로잉 목록 조회
-    @GetMapping
-    public ResponseEntity<List<FollowDto>> getMyFollowings(@SessionAttribute(name = "userId", required = false) Long userId) {
+    // 내 팔로잉 목록 및 팔로잉 수 조회
+    @GetMapping("/following")
+    public ResponseEntity<MyFollowResponse> getMyFollowingList(@SessionAttribute(name = "userId", required = false) Long userId) {
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
         List<FollowDto> followings = followService.getMyFollowings(userId);
-        return ResponseEntity.ok(followings);
+        int followingCount = followService.getFollowingCount(userId);
+
+        MyFollowResponse response = new MyFollowResponse(followings, followingCount);
+        return ResponseEntity.ok(response);
+    }
+
+    // 내 팔로워 목록 및 팔로워 수 조회
+    @GetMapping("/followers")
+    public ResponseEntity<MyFollowResponse> getMyFollowerList(@SessionAttribute(name = "userId", required = false) Long userId) {
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        List<FollowDto> followers = followService.getMyFollowers(userId);
+        int followerCount = followService.getFollowerCount(userId);
+
+        MyFollowResponse response = new MyFollowResponse(followers, followerCount);
+        return ResponseEntity.ok(response);
     }
 
 
