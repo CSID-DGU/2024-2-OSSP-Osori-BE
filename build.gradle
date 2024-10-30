@@ -53,3 +53,8 @@ tasks.named('test') {
 tasks.named('bootJar') {
     archiveFileName = 'osori.jar'
 }
+
+// Disable jar task to prevent duplicate JARs
+tasks.named('jar') {
+    enabled = false
+}
