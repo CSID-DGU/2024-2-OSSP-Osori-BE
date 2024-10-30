@@ -56,7 +56,10 @@ jobs:
     - name: Deploy Docker container
       run: |
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
-        sudo docker stop $(sudo docker ps -a -q)
+        CONTAINER_ID=$(sudo docker ps -q)
+        if [ -n "$CONTAINER_ID" ]; then
+          sudo docker stop "$CONTAINER_ID"
+        fi
         sudo docker rm $(sudo docker ps --filter 'status=exited' -a -q)
         sudo docker image prune -a -f
         sudo docker run -d --restart unless-stopped --log-driver=syslog -p 8080:8080 \
@@ -70,3 +73,4 @@ jobs:
           -e SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} \
           -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
           ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+
