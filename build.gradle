@@ -55,4 +55,10 @@ tasks.named('test') {
 
 tasks.named('jar') {
     archiveFileName = 'osori.jar'
+    manifest {
+        attributes(
+                'Main-Class': 'dongguk.osori.OsoriApplication'
+        )
+    }
 }
+
