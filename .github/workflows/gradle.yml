@@ -56,12 +56,23 @@ jobs:
     - name: Deploy Docker container
       run: |
         sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+
+        # 실행 중인 컨테이너 중지
         CONTAINER_ID=$(sudo docker ps -q)
         if [ -n "$CONTAINER_ID" ]; then
           sudo docker stop "$CONTAINER_ID"
         fi
-        sudo docker rm $(sudo docker ps --filter 'status=exited' -a -q)
+
+        # 중지된 컨테이너 제거
+        EXITED_CONTAINERS=$(sudo docker ps --filter 'status=exited' -a -q)
+        if [ -n "$EXITED_CONTAINERS" ]; then
+          sudo docker rm $EXITED_CONTAINERS
+        fi
+
+        # 이미지 정리
         sudo docker image prune -a -f
+
+        # 새로운 컨테이너 실행
         sudo docker run -d --restart unless-stopped --log-driver=syslog -p 8080:8080 \
           -e DB_URL=${{ secrets.DB_URL }} \
           -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -73,4 +84,5 @@ jobs:
           -e SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} \
           -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
           ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+
 
