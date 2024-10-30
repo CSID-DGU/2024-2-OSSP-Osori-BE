@@ -17,7 +17,6 @@ repositories {
     mavenCentral()
 }
 
-
 dependencies {
     // Starters
     implementation 'org.springframework.boot:spring-boot-starter'
@@ -50,8 +49,10 @@ dependencies {
     //implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 }
 
-
 tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.named('jar') {
+    archiveFileName = 'osori.jar'
+}
