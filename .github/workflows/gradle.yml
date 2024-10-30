@@ -48,9 +48,9 @@ jobs:
     # Docker 이미지 빌드 및 배포
     - name: Docker build & push to Docker hub
       run: |
-        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/docker-test . && \
-        docker push ${{ secrets.DOCKER_USERNAME }}/docker-test
+        sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        sudo docker build -t ${{ secrets.DOCKER_USERNAME }}/docker-test . && \
+        sudo docker push ${{ secrets.DOCKER_USERNAME }}/docker-test
 
     # Docker 컨테이너 실행
     - name: Deploy Docker container
