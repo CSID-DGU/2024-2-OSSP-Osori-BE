@@ -1,4 +1,4 @@
-name: 아코밍 CI/CD
+name: 아코밍 CI/CD 
 
 on:
   push:
