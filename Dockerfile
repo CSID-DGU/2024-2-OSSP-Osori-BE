@@ -8,7 +8,7 @@ WORKDIR /app
 COPY src/resources/application.yml /app/resources/application.yml
 
 # JAR 파일 복사
-COPY build/libs/your-app-0.0.1-SNAPSHOT.jar app.jar
+COPY build/libs/app.jar /app/app.jar
 
 # 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
