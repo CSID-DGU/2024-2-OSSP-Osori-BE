@@ -68,7 +68,7 @@ jobs:
             sudo docker rm docker-test
           fi
 
-          # 새 컨테이너 실행 및 환경 변수 로그 출력
+          # 새 컨테이너 실행 및 application.yml 확인
           sudo docker run -d --name docker-test -p 8080:8080 \
             -e DB_URL=${{ secrets.DB_URL }} \
             -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
@@ -80,7 +80,7 @@ jobs:
             -e SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} \
             -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
             ${{ secrets.DOCKER_USERNAME }}/docker-test:latest \
-            sh -c "echo 'DB_URL=$DB_URL DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD REDIS_HOST=$REDIS_HOST REDIS_PORT=$REDIS_PORT SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD' && java -jar /app.jar"
+            sh -c "echo 'DB_URL=$DB_URL DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD REDIS_HOST=$REDIS_HOST REDIS_PORT=$REDIS_PORT SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD' && ls /app/resources/application.yml && cat /app/resources/application.yml && java -jar /app.jar"
 
           # 실행 중인 컨테이너 확인
           sudo docker ps -a | grep "docker-test"
