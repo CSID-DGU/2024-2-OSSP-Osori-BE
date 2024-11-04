@@ -1,4 +1,4 @@
-name: 아코밍 CI/CD
+name: DuoBloom CI/CD pipeline
 
 on:
   push:
@@ -48,8 +48,8 @@ jobs:
     - name: Docker build & push to Docker Hub
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/docker-test:latest .
-        docker push ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/akoming-test:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/akoming-test:latest
 
     # EC2에 배포
     - name: Docker image pull & deploy to EC2
@@ -60,21 +60,21 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
           # 최신 이미지 Pull
-          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/akoming-test:latest
 
           # 기존 컨테이너 중지 및 삭제
-          if [ "$(sudo docker ps -q -f name=docker-test)" ]; then
-            sudo docker stop docker-test
-            sudo docker rm docker-test
+          if [ "$(sudo docker ps -q -f name=akoming-test)" ]; then
+            sudo docker stop akoming-test
+            sudo docker rm akoming-test
           fi
 
           # 새 컨테이너 실행 및 환경 변수 전달
-          sudo docker run -d --log-driver=syslog --name docker-test -p 8080:8080 \
+          sudo docker run -d --log-driver=syslog --name akoming-test -p 8080:8080 \
             --env-file ~/.env \
-            ${{ secrets.DOCKER_USERNAME }}/docker-test:latest
+            ${{ secrets.DOCKER_USERNAME }}/akoming-test:latest
 
           # 실행 중인 컨테이너 확인
-          sudo docker ps -a | grep "docker-test"
+          sudo docker ps -a | grep "akoming-test"
 
           # 사용하지 않는 이미지 및 컨테이너 정리
           sudo docker image prune -a -f
