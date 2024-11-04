@@ -41,8 +41,14 @@ jobs:
         restore-keys: |
           gradle-${{ runner.os }}-
 
+    # Gradle 빌드
     - name: Build with Gradle Wrapper
       run: ./gradlew build
+
+    # 빌드 후 JAR 파일 이름 변경 (app.jar로 통일)
+    - name: Rename JAR file
+      run: |
+        cp build/libs/*.jar build/libs/app.jar
 
     # Docker 빌드 및 Docker Hub에 푸시
     - name: Docker build & push to Docker Hub
@@ -80,7 +86,7 @@ jobs:
             -e SMTP_USERNAME=${{ secrets.SMTP_USERNAME }} \
             -e SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} \
             ${{ secrets.DOCKER_USERNAME }}/docker-test:latest \
-            sh -c "echo 'DB_URL=$DB_URL DB_USERNAME=$DB_USERNAME DB_PASSWORD=$DB_PASSWORD REDIS_HOST=$REDIS_HOST REDIS_PORT=$REDIS_PORT SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD' && ls /app/resources/application.yml && cat /app/resources/application.yml && java -jar /app.jar"
+            sh -c "ls /app/resources/application.yml && cat /app/resources/application.yml && java -jar /app/app.jar"
 
           # 실행 중인 컨테이너 확인
           sudo docker ps -a | grep "docker-test"
