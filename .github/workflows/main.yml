@@ -1,4 +1,4 @@
-name: 아코밍 CI/CD
+name: akoming CI/CD pipeline
 
 on:
   push:
