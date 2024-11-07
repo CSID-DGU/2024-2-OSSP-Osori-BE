@@ -122,5 +122,16 @@ public class UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
     }
+
+    // 팔로우하는 사용자 목록 반환 메소드
+    @Transactional(readOnly = true)
+    public List<UserDto> getFollowingUsers(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 아이디를 찾을 수 없음: " + userId));
+
+        return user.getFollowingUsers().stream()
+                .map(followedUser -> new UserDto(followedUser.getUserId(), followedUser.getNickname(), followedUser.getEmail()))
+                .collect(Collectors.toList());
+    }
 }
 

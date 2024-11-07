@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,11 +16,12 @@ import java.time.LocalDateTime;
 @Entity
 public class Goal {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long goalId;
 
     @Column(nullable = false)
-    private String context;
+    private String content;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -31,10 +34,20 @@ public class Goal {
     @JsonIgnore
     private User user;
 
+    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GoalComment> comments = new ArrayList<>();
 
-    public void updateContext(String context) { this.context = context; }
-    public void markAsCompleted() { this.completed = true; }
-    public void markAsIncomplete() { this.completed = false; }
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void markAsCompleted() {
+        this.completed = true;
+    }
+
+    public void markAsIncomplete() {
+        this.completed = false;
+    }
 
     @PrePersist
     public void prePersist() {
@@ -43,9 +56,10 @@ public class Goal {
     }
 
     @Builder
-    public Goal(String context, User user) {
-        this.context = context;
+    public Goal(String content, User user) {
+        this.content = content;
         this.user = user;
+        this.createdAt = LocalDateTime.now();
+        this.completed = false;
     }
-
 }
