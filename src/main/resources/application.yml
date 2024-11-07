@@ -19,7 +19,7 @@ spring:
     timeout: 1800s
 
   redis:
-    host: host.docker.internal
+    host: redis
     port: 6379
     password: ${REDIS_PASSWORD}
 
