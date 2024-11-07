@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,9 +38,8 @@ public class User {
 
     @Column(nullable = true)
     private String introduce;
+
     private Integer balance;
-
-
 
     public void updateNickName(String nickname) {
         this.nickname = nickname;
@@ -66,5 +66,10 @@ public class User {
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followers = new ArrayList<>();
 
-
+    // 팔로우하는 사용자 목록 반환
+    public List<User> getFollowingUsers() {
+        return following.stream()
+                .map(Follow::getFollowing)
+                .collect(Collectors.toList());
+    }
 }

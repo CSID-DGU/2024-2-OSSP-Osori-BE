@@ -1,8 +1,6 @@
-package dongguk.osori.domain.goal;
+package dongguk.osori.domain.goal.controller;
 
-import dongguk.osori.domain.goal.dto.GoalCompletionDto;
-import dongguk.osori.domain.goal.dto.GoalDto;
-import dongguk.osori.domain.goal.entity.Goal;
+import dongguk.osori.domain.goal.dto.*;
 import dongguk.osori.domain.goal.service.GoalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,14 +29,32 @@ public class GoalController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
     @GetMapping
-    public ResponseEntity<List<Goal>> getUserGoals(HttpSession session) {
+    public ResponseEntity<List<GoalResponseDto>> getUserGoals(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        List<Goal> goals = goalService.getUserGoals(userId);
+        List<GoalResponseDto> goals = goalService.getUserGoals(userId);
         return ResponseEntity.ok(goals);
     }
+
+    @Operation(summary = "목표 단일 조회", description = "특정 목표의 내용을 조회하고 연관된 댓글을 함께 보여줍니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "목표 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "404", description = "목표를 찾을 수 없음")
+    })
+    @GetMapping("/{goalId}")
+    public ResponseEntity<GoalDetailResponseDto> getGoalById(@PathVariable("goalId") Long goalId, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Optional<GoalDetailResponseDto> goalDetail = goalService.getGoalDetailsWithComments(goalId);
+        return goalDetail.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 
     @Operation(summary = "로그인한 사용자의 목표 생성", description = "로그인한 사용자의 새로운 목표를 생성합니다.")
     @ApiResponses(value = {
@@ -46,12 +62,12 @@ public class GoalController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
     @PostMapping
-    public ResponseEntity<Goal> createGoal(@RequestBody GoalDto goalDto, HttpSession session) {
+    public ResponseEntity<GoalResponseDto> createGoal(@RequestBody GoalDto goalDto, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        Goal createdGoal = goalService.createGoal(goalDto, userId);
+        GoalResponseDto createdGoal = goalService.createGoal(goalDto, userId);
         return ResponseEntity.ok(createdGoal);
     }
 
@@ -62,12 +78,12 @@ public class GoalController {
             @ApiResponse(responseCode = "404", description = "목표를 찾을 수 없음")
     })
     @PatchMapping("/{goalId}")
-    public ResponseEntity<Goal> updateGoal(@PathVariable("goalId") Long goalId, @RequestBody GoalDto goalDto, HttpSession session) {
+    public ResponseEntity<GoalResponseDto> updateGoal(@PathVariable("goalId") Long goalId, @RequestBody GoalDto goalDto, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        Optional<Goal> updatedGoal = goalService.updateGoal(goalId, goalDto, userId);
+        Optional<GoalResponseDto> updatedGoal = goalService.updateGoal(goalId, goalDto, userId);
         return updatedGoal.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -83,7 +99,7 @@ public class GoalController {
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        goalService.deleteGoal(goalId, userId);
+        goalService.deleteGoal(userId, goalId);
         return ResponseEntity.noContent().build();
     }
 
@@ -94,12 +110,12 @@ public class GoalController {
             @ApiResponse(responseCode = "404", description = "목표를 찾을 수 없음")
     })
     @PatchMapping("/{goalId}/completion")
-    public ResponseEntity<Goal> updateGoalCompletion(@PathVariable("goalId") Long goalId, @RequestBody GoalCompletionDto goalCompletionDto, HttpSession session) {
+    public ResponseEntity<GoalResponseDto> updateGoalCompletion(@PathVariable("goalId") Long goalId, @RequestBody GoalCompletionDto goalCompletionDto, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        Optional<Goal> updatedGoal = goalService.updateGoalCompletionStatus(goalId, goalCompletionDto, userId);
+        Optional<GoalResponseDto> updatedGoal = goalService.updateGoalCompletionStatus(goalId, goalCompletionDto, userId);
         return updatedGoal.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
