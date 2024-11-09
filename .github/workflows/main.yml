@@ -69,6 +69,19 @@ jobs:
             sudo docker rm docker-test
           fi
 
+          # 환경 변수 파일 생성
+          echo "DB_URL=${{ secrets.DB_URL }}" > ~/.env
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> ~/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ~/.env
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> ~/.env
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> ~/.env
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> ~/.env
+          echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> ~/.env
+          echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> ~/.env
+          echo "SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}" >> ~/.env
+          echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> ~/.env
+      
+
           # 새 컨테이너 실행 및 환경 변수 전달
           sudo docker run -d --log-driver=syslog --name docker-test -p 8080:8080 \
             --env-file ~/.env \
@@ -79,4 +92,3 @@ jobs:
 
           # 사용하지 않는 이미지 및 컨테이너 정리
           sudo docker image prune -a -f
-
