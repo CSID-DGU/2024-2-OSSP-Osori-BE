@@ -19,8 +19,9 @@ spring:
     timeout: 1800s
 
   redis:
-    host: localhost
+    host: ${REDIS_HOST}
     port: 6379
+    passowrd: ${REDIS_PASSWORD}
 
   mail:
     host: smtp.gmail.com
