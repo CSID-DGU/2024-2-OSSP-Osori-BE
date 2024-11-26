@@ -8,13 +8,12 @@ import dongguk.osori.domain.goal.entity.GoalComment;
 import dongguk.osori.domain.goal.repository.GoalCommentRepository;
 import dongguk.osori.domain.goal.repository.GoalRepository;
 import dongguk.osori.domain.user.entity.User;
-import dongguk.osori.domain.user.UserRepository;
+import dongguk.osori.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
