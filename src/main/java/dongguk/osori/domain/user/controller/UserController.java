@@ -1,4 +1,4 @@
-package dongguk.osori.domain.user;
+package dongguk.osori.domain.user.controller;
 
 import dongguk.osori.domain.user.dto.*;
 import dongguk.osori.domain.user.service.EmailService;

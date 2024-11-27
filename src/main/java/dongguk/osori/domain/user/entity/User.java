@@ -3,6 +3,7 @@ package dongguk.osori.domain.user.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dongguk.osori.domain.follow.entity.Follow;
 import dongguk.osori.domain.goal.entity.Goal;
+import dongguk.osori.domain.portfolio.entity.Portfolio;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,7 +50,8 @@ public class User {
     public void updateMajor(String major) { this.major = major; }
     public void updateStudentNumber(int studentNumber) { this.studentNumber = studentNumber; }
     public void updateIntroduce(String introduce) { this.introduce = introduce; }
-    public void updateBalance(int amount) {
+    public void updateBalance(int
+                                      amount) {
         if (this.balance == null) {
             this.balance = 0;
         }
@@ -65,6 +67,9 @@ public class User {
 
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Portfolio> portfolios = new ArrayList<>();
 
     // 팔로우하는 사용자 목록 반환
     public List<User> getFollowingUsers() {

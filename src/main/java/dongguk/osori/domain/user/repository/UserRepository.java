@@ -1,4 +1,4 @@
-package dongguk.osori.domain.user;
+package dongguk.osori.domain.user.repository;
 
 import dongguk.osori.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

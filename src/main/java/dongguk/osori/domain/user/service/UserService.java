@@ -1,6 +1,6 @@
 package dongguk.osori.domain.user.service;
 
-import dongguk.osori.domain.user.UserRepository;
+import dongguk.osori.domain.user.repository.UserRepository;
 import dongguk.osori.domain.user.dto.*;
 import dongguk.osori.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;

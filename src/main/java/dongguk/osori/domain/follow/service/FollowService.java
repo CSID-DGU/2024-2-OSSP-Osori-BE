@@ -3,12 +3,11 @@ package dongguk.osori.domain.follow.service;
 import dongguk.osori.domain.follow.FollowRepository;
 import dongguk.osori.domain.follow.dto.FollowDto;
 import dongguk.osori.domain.follow.entity.Follow;
-import dongguk.osori.domain.user.UserRepository;
+import dongguk.osori.domain.user.repository.UserRepository;
 import dongguk.osori.domain.user.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
