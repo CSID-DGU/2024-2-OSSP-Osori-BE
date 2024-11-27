@@ -48,6 +48,7 @@ server:
         name: JSESSIONID
         secure: true
         http-only: true
+        same-site: None
       timeout: 60m
 
 cloud:
