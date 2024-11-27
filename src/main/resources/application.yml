@@ -49,3 +49,15 @@ server:
         secure: false
         http-only: true
       timeout: 30m
+
+cloud:
+  aws:
+    s3:
+      bucket: osoribucket
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
