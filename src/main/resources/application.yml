@@ -46,9 +46,9 @@ server:
     session:
       cookie:
         name: JSESSIONID
-        secure: false
+        secure: true
         http-only: true
-      timeout: 30m
+      timeout: 60m
 
 cloud:
   aws:
