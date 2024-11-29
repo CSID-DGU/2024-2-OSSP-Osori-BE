@@ -16,4 +16,5 @@ public class PortfolioRequestDto {
     private List<String> tags;
     private ExperienceDto experience;
     private PmiDto pmi;
+    private List<String> photoUrls;
 }
