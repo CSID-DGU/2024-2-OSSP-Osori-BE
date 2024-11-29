@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -19,15 +22,30 @@ public class Portfolio {
     private Long portfolioId;
 
     private String name;
+
     private LocalDate startDate;
+
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    @PreUpdate
+    private void onPrePersistOrUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @ElementCollection
     @CollectionTable(name = "portfolio_tags", joinColumns = @JoinColumn(name = "portfolio_id"))
     @Column(name = "tag")
     private Set<String> tags = new HashSet<>();
 
-    public Portfolio(String name, LocalDate startDate, Set<String> tags, Experience experience, Pmi pmi, User user) {
+    @ElementCollection
+    @CollectionTable(name = "portfolio_photos", joinColumns = @JoinColumn(name = "portfolio_id"))
+    @Column(name = "photo_url")
+    private List<String> photoUrls = new ArrayList<>();
+
+    public Portfolio(String name, LocalDateTime updatedAt, LocalDate startDate, Set<String> tags, Experience experience, Pmi pmi, User user) {
         this.name = name;
+        this.updatedAt = updatedAt;
         this.startDate = startDate;
         this.tags = tags;
         this.user = user;
@@ -53,6 +71,10 @@ public class Portfolio {
         if (pmi != null) {
             pmi.setPortfolio(this);
         }
+    }
+
+    public void addPhotoUrl(String photoUrl) {
+        this.photoUrls.add(photoUrl);
     }
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "portfolio")

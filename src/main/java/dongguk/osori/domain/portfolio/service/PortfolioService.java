@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,12 +41,15 @@ public class PortfolioService {
 
         Portfolio portfolio = new Portfolio(
                 requestDto.getName(),
+                LocalDateTime.now(),
                 requestDto.getStartDate(),
                 Set.copyOf(requestDto.getTags()),
                 experience,
                 pmi,
                 user
         );
+
+        requestDto.getPhotoUrls().forEach(portfolio::addPhotoUrl);
 
         portfolioRepository.save(portfolio);
 
@@ -78,6 +82,9 @@ public class PortfolioService {
                 Set.copyOf(requestDto.getTags())
         );
 
+        portfolio.getPhotoUrls().clear();
+        requestDto.getPhotoUrls().forEach(portfolio::addPhotoUrl);
+
         portfolio.getExperience().update(
                 requestDto.getExperience().getSituation(),
                 requestDto.getExperience().getTask(),
@@ -106,6 +113,7 @@ public class PortfolioService {
         return new PortfolioBaseDto(
                 portfolio.getPortfolioId(),
                 portfolio.getName(),
+                portfolio.getUpdatedAt(),
                 portfolio.getStartDate(),
                 List.copyOf(portfolio.getTags())
         );
@@ -133,9 +141,9 @@ public class PortfolioService {
         return new PortfolioDetailDto(
                 mapToBaseDto(portfolio),
                 experienceDto,
-                pmiDto
+                pmiDto,
+                List.copyOf(portfolio.getPhotoUrls())
         );
     }
-
 }
 
