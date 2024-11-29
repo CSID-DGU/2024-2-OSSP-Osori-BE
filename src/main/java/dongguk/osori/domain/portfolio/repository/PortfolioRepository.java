@@ -13,11 +13,12 @@ import java.util.Optional;
 @Repository
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
-    @EntityGraph(attributePaths = {"experience", "pmi"})
+    @EntityGraph(attributePaths = {"experience", "pmi", "photoUrls"})
     @Query("SELECT p FROM Portfolio p WHERE p.portfolioId = :portfolioId AND p.user.userId = :userId")
     Optional<Portfolio> findPortfolioWithDetails(@Param("portfolioId") Long portfolioId, @Param("userId") Long userId);
 
-    @EntityGraph(attributePaths = {"experience", "pmi"})
+    @EntityGraph(attributePaths = {"experience", "pmi", "photoUrls"})
     @Query("SELECT p FROM Portfolio p WHERE p.user.userId = :userId")
     List<Portfolio> findAllPortfoliosWithDetailsByUserId(@Param("userId") Long userId);
 }
+
