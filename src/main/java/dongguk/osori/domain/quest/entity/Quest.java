@@ -20,7 +20,7 @@ public class Quest {
     private LocalDate date; // 퀘스트가 속한 날짜
 
     @Column(nullable = false)
-    private boolean attended; // 출석 여부
+    private boolean attended = true; // 출석 여부
 
     @Column(nullable = false)
     private boolean goalWritten; // 목표 작성 여부
