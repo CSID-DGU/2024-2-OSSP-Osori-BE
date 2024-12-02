@@ -1,6 +1,7 @@
 package dongguk.osori.domain.goal.controller;
 
 import dongguk.osori.domain.goal.dto.GoalCommentDto;
+import dongguk.osori.domain.goal.dto.GoalCommentRequestDto;
 import dongguk.osori.domain.goal.dto.GoalCommentResponseDto;
 import dongguk.osori.domain.goal.service.GoalCommentService;
 import jakarta.servlet.http.HttpSession;
@@ -26,16 +27,17 @@ public class GoalCommentController {
             @Parameter(description = "댓글을 추가할 목표의 ID", required = true)
             @PathVariable("goalId") Long goalId,
             @Parameter(description = "댓글의 내용 (이모지와 내용 포함)", required = true)
-            @RequestBody GoalCommentDto commentDto,
+            @RequestBody GoalCommentRequestDto goalRequestDto,
             @Parameter(hidden = true) HttpSession session) {
 
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        GoalCommentResponseDto response = goalCommentService.addComment(goalId, userId, commentDto);
+        GoalCommentResponseDto response = goalCommentService.addComment(goalId, userId, goalRequestDto); // goalRequestDto로 변경
         return ResponseEntity.ok(response);
     }
+
 
     // 댓글 삭제
     @Operation(summary = "댓글 삭제", description = "특정 목표의 댓글을 삭제합니다.")

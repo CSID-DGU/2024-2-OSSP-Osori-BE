@@ -1,8 +1,8 @@
 package dongguk.osori.domain.goal.service;
 
-import dongguk.osori.domain.goal.dto.GoalCommentDto;
 import dongguk.osori.domain.goal.dto.GoalCommentResponseDto;
 import dongguk.osori.domain.goal.dto.GoalDetailResponseDto;
+import dongguk.osori.domain.goal.dto.GoalCommentRequestDto;
 import dongguk.osori.domain.goal.entity.Goal;
 import dongguk.osori.domain.goal.entity.GoalComment;
 import dongguk.osori.domain.goal.repository.GoalCommentRepository;
@@ -29,15 +29,15 @@ public class GoalCommentService {
 
     // 댓글 추가
     @Transactional
-    public GoalCommentResponseDto addComment(Long goalId, Long userId, GoalCommentDto commentDto) {
+    public GoalCommentResponseDto addComment(Long goalId, Long userId, GoalCommentRequestDto goalRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
 
         GoalComment comment = GoalComment.builder()
-                .content(commentDto.getContent())
-                .emoji(commentDto.getEmoji())
+                .content(goalRequestDto.getContent())
+                .emoji(goalRequestDto.getEmoji())
                 .goal(goal)
                 .user(user)
                 .build();
@@ -52,6 +52,7 @@ public class GoalCommentService {
                 comment.getEmoji()
         );
     }
+
 
     // 댓글 조회
     @Transactional
