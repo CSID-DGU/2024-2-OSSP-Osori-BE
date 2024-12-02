@@ -20,8 +20,8 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long goalId;
 
-    @Column(nullable = false)
-    private String content;
+    @Column(nullable = false, columnDefinition = "TEXT DEFAULT ''")
+    private String content = "";
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
