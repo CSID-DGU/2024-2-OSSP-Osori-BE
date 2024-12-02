@@ -56,6 +56,14 @@ public class Quest {
         this.portfolioWritten = true;
     }
 
+    public void resetDailyStatus() {
+        this.attended = false;
+        this.goalWritten = false;
+        this.commentedOnFriendGoal = false;
+        this.portfolioWritten = false;
+    }
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
