@@ -65,18 +65,18 @@ public class FollowController {
             @ApiResponse(responseCode = "404", description = "해당 이메일의 사용자를 찾을 수 없음")
     })
     @PostMapping()
-    public ResponseEntity<Void> followUserByEmail(@SessionAttribute(name = "userId", required = false) Long userId,
-                                                  @RequestBody FollowRequestDto followRequestDto) {
+    public ResponseEntity<Void> followUserByEmail(@SessionAttribute(name = "userId", required = false) Long userId, @RequestBody FollowRequestDto followRequestDto) {
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
 
-        try {
-            followService.followUserByEmail(userId, followRequestDto.getEmail());
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(404).body(null);
+        User userToFollow = userService.findUserByEmail(followRequestDto.getEmail());
+        if (userToFollow == null) {
+            return ResponseEntity.status(404).build();
         }
+
+        followService.followUser(userId, userToFollow.getUserId());
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "언팔로우", description = "사용자를 언팔로우합니다.")
