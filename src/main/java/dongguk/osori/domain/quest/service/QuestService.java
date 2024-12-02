@@ -30,7 +30,7 @@ public class QuestService {
 
         // 모든 미션이 완료되었는지 확인
         if (!quest.isAllMissionsCompleted()) {
-            throw new IllegalStateException("모든 미션이 완료되지 않았습니다.");
+            return; // 미션이 완료되지 않았으면 아무 동작도 하지 않음
         }
 
         // 스탬프 증가
@@ -47,6 +47,14 @@ public class QuestService {
         Stamp stamp = stampRepository.findByUser_UserIdAndWeekNumberAndYear(userId, weekNumber, year)
                 .orElseGet(() -> new Stamp(user, weekNumber, year));
 
+        // 오늘 날짜에 해당하는 스탬프가 이미 채워졌는지 확인
+        int todayDayOfWeek = date.getDayOfWeek().getValue(); // 월요일(1) ~ 일요일(7)
+        if (stamp.getCount() >= todayDayOfWeek) {
+            // 이미 채워져 있는 경우 메서드 종료
+            return;
+        }
+
+        // 스탬프를 증가시킴
         stamp.incrementStamp();
         stampRepository.save(stamp);
     }

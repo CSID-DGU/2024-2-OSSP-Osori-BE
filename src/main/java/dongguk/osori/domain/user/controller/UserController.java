@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://2024-2-oss-proj-osori-fe.vercel.app")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
