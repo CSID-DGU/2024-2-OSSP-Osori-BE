@@ -3,6 +3,8 @@ package dongguk.osori.domain.portfolio.service;
 import dongguk.osori.domain.portfolio.dto.*;
 import dongguk.osori.domain.portfolio.entity.*;
 import dongguk.osori.domain.portfolio.repository.PortfolioRepository;
+import dongguk.osori.domain.quest.entity.MissionType;
+import dongguk.osori.domain.quest.service.QuestService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
+    private final QuestService questService;
 
     @Transactional
     public PortfolioDetailDto createPortfolio(Long userId, PortfolioRequestDto requestDto) {
@@ -52,6 +55,9 @@ public class PortfolioService {
         requestDto.getPhotoUrls().forEach(portfolio::addPhotoUrl);
 
         portfolioRepository.save(portfolio);
+
+        // 퀘스트 업데이트
+        questService.updateMissionStatus(userId, MissionType.PORTFOLIO_WRITTEN);
 
         return mapToDetailDto(portfolio);
     }

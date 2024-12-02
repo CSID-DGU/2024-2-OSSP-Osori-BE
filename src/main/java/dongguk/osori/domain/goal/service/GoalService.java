@@ -4,6 +4,8 @@ import dongguk.osori.domain.goal.dto.*;
 import dongguk.osori.domain.goal.repository.GoalCommentRepository;
 import dongguk.osori.domain.goal.repository.GoalRepository;
 import dongguk.osori.domain.goal.entity.Goal;
+import dongguk.osori.domain.quest.entity.MissionType;
+import dongguk.osori.domain.quest.service.QuestService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +27,7 @@ public class GoalService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final GoalCommentRepository goalCommentRepository;
+    private final QuestService questService;
 
     // 로그인된 사용자 가져오기
     private User getLoggedInUser(Long userId) {
@@ -45,18 +48,18 @@ public class GoalService {
     // 로그인된 사용자의 목표 생성
     @Transactional
     public GoalResponseDto createGoal(GoalDto goalDto, Long userId) {
-        log.debug("Creating goal for user ID: {}", userId); // 디버깅용
         User user = getLoggedInUser(userId);
-        log.debug("User found: {}", user); // 디버깅용
 
-        // Goal Builder 사용하여 새로운 목표 생성
         Goal goal = Goal.builder()
                 .content(goalDto.getContent())
                 .user(user)
                 .build();
-        log.debug("New goal created: {}", goal); // 디버깅용
 
         goalRepository.save(goal);
+
+        // 퀘스트 업데이트
+        questService.updateMissionStatus(userId, MissionType.GOAL_WRITTEN);
+
         return new GoalResponseDto(goal.getGoalId(), goal.getContent(), goal.getCreatedAt(), goal.isCompleted());
     }
 

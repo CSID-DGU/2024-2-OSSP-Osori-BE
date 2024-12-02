@@ -1,12 +1,14 @@
 package dongguk.osori.domain.goal.service;
 
-import dongguk.osori.domain.goal.dto.GoalCommentDto;
 import dongguk.osori.domain.goal.dto.GoalCommentResponseDto;
 import dongguk.osori.domain.goal.dto.GoalDetailResponseDto;
+import dongguk.osori.domain.goal.dto.GoalCommentRequestDto;
 import dongguk.osori.domain.goal.entity.Goal;
 import dongguk.osori.domain.goal.entity.GoalComment;
 import dongguk.osori.domain.goal.repository.GoalCommentRepository;
 import dongguk.osori.domain.goal.repository.GoalRepository;
+import dongguk.osori.domain.quest.entity.MissionType;
+import dongguk.osori.domain.quest.service.QuestService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,23 +28,27 @@ public class GoalCommentService {
     private final GoalCommentRepository goalCommentRepository;
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
+    private final QuestService questService;
 
     // 댓글 추가
     @Transactional
-    public GoalCommentResponseDto addComment(Long goalId, Long userId, GoalCommentDto commentDto) {
+    public GoalCommentResponseDto addComment(Long goalId, Long userId, GoalCommentRequestDto goalRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new RuntimeException("Goal not found"));
 
         GoalComment comment = GoalComment.builder()
-                .content(commentDto.getContent())
-                .emoji(commentDto.getEmoji())
+                .content(goalRequestDto.getContent())
+                .emoji(goalRequestDto.getEmoji())
                 .goal(goal)
                 .user(user)
                 .build();
 
         goalCommentRepository.save(comment);
+
+        questService.updateMissionStatus(userId, MissionType.COMMENTED_ON_FRIEND_GOAL);
+
 
         return new GoalCommentResponseDto(
                 comment.getCommentId(),
@@ -52,6 +58,7 @@ public class GoalCommentService {
                 comment.getEmoji()
         );
     }
+
 
     // 댓글 조회
     @Transactional

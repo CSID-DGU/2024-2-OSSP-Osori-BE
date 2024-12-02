@@ -1,5 +1,8 @@
 package dongguk.osori.domain.user.service;
 
+import dongguk.osori.domain.quest.dto.MissionRequestDto;
+import dongguk.osori.domain.quest.entity.MissionType;
+import dongguk.osori.domain.quest.service.QuestService;
 import dongguk.osori.domain.user.repository.UserRepository;
 import dongguk.osori.domain.user.dto.*;
 import dongguk.osori.domain.user.entity.User;
@@ -9,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final QuestService questService;
 
     // 회원가입 로직
     @Transactional
@@ -41,7 +46,7 @@ public class UserService {
 
 
     // 로그인 인증 로직
-    @Transactional(readOnly = true)
+    @Transactional
     public Long authenticate(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일을 가진 유저가 없습니다."));
@@ -50,6 +55,9 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
+
+        // 퀘스트 업데이트
+        questService.updateMissionStatus(user.getUserId(), MissionType.ATTENDANCE_CHECKED);
 
         // 인증 성공 시 유저 ID 반환
         return user.getUserId();
