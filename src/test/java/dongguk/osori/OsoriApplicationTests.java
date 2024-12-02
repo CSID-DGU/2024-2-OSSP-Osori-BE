@@ -8,6 +8,6 @@ class OsoriApplicationTests {
 
     @Test
     void contextLoads() {
-
     }
+
 }

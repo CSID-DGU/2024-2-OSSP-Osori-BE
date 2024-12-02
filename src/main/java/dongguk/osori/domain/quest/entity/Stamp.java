@@ -39,6 +39,11 @@ public class Stamp {
         return count == 7;
     }
 
+    public void resetStampCount() {
+        this.count = 0;
+    }
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
