@@ -7,6 +7,8 @@ import dongguk.osori.domain.goal.entity.Goal;
 import dongguk.osori.domain.goal.entity.GoalComment;
 import dongguk.osori.domain.goal.repository.GoalCommentRepository;
 import dongguk.osori.domain.goal.repository.GoalRepository;
+import dongguk.osori.domain.quest.entity.MissionType;
+import dongguk.osori.domain.quest.service.QuestService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,6 +28,7 @@ public class GoalCommentService {
     private final GoalCommentRepository goalCommentRepository;
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
+    private final QuestService questService;
 
     // 댓글 추가
     @Transactional
@@ -43,6 +46,9 @@ public class GoalCommentService {
                 .build();
 
         goalCommentRepository.save(comment);
+
+        questService.updateMissionStatus(userId, MissionType.COMMENTED_ON_FRIEND_GOAL);
+
 
         return new GoalCommentResponseDto(
                 comment.getCommentId(),
