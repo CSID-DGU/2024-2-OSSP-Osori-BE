@@ -56,9 +56,6 @@ public class UserService {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
 
-        // 퀘스트 업데이트
-        questService.updateMissionStatus(user.getUserId(), MissionType.ATTENDANCE_CHECKED);
-
         // 인증 성공 시 유저 ID 반환
         return user.getUserId();
     }
