@@ -80,6 +80,23 @@ public class FollowService {
         followRepository.save(follow);
     }
 
+    @Transactional
+    public void followUserByEmail(Long userId, String email) {
+        User follower = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Logged-in user not found with id: " + userId));
+
+        User following = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+
+        boolean alreadyFollowing = followRepository.findByFollowerAndFollowing(follower, following).isPresent();
+        if (alreadyFollowing) {
+            throw new IllegalArgumentException("You are already following this user.");
+        }
+
+        followRepository.save(new Follow(follower, following));
+    }
+
+
     // 언팔로우
     @Transactional
     public void unfollowUser(Long userId, Long followingId) {
