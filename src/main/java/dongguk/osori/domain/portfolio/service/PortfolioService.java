@@ -29,7 +29,7 @@ public class PortfolioService {
     @Transactional
     public PortfolioDetailDto createPortfolio(Long userId, PortfolioRequestDto requestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Experience experience = new Experience(
                 requestDto.getExperience().getSituation(),
@@ -82,7 +82,11 @@ public class PortfolioService {
     @Transactional
     public PortfolioDetailDto updatePortfolio(Long userId, Long portfolioId, PortfolioRequestDto requestDto) {
         Portfolio portfolio = portfolioRepository.findPortfolioWithDetails(portfolioId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found or access denied for ID: " + portfolioId));
+                .orElseThrow(() -> new CustomException(ErrorCode.PORTFOLIO_NOT_FOUND));
+
+        if (!portfolio.getUser().getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.PORTFOLIO_ACCESS_FORBIDDEN);
+        }
 
         portfolio.update(
                 requestDto.getName(),
@@ -112,7 +116,11 @@ public class PortfolioService {
     @Transactional
     public void deletePortfolio(Long userId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findPortfolioWithDetails(portfolioId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found or access denied for ID: " + portfolioId));
+                .orElseThrow(() -> new CustomException(ErrorCode.PORTFOLIO_NOT_FOUND));
+
+        if (!portfolio.getUser().getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.PORTFOLIO_ACCESS_FORBIDDEN);
+        }
 
         portfolioRepository.delete(portfolio);
     }
