@@ -7,6 +7,8 @@ import dongguk.osori.domain.quest.entity.MissionType;
 import dongguk.osori.domain.quest.service.QuestService;
 import dongguk.osori.domain.user.entity.User;
 import dongguk.osori.domain.user.repository.UserRepository;
+import dongguk.osori.global.exception.CustomException;
+import dongguk.osori.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,7 +74,7 @@ public class PortfolioService {
     @Transactional(readOnly = true)
     public PortfolioDetailDto getPortfolioDetail(Long userId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findPortfolioWithDetails(portfolioId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found or access denied for ID: " + portfolioId));
+                .orElseThrow(() -> new CustomException(ErrorCode.PORTFOLIO_NOT_FOUND));
 
         return mapToDetailDto(portfolio);
     }
