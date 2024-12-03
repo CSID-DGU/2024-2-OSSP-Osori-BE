@@ -27,14 +27,15 @@ public class FeedController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
     })
     @GetMapping
-    public ResponseEntity<List<FeedGoalDto>> getTodayFeedGoals(HttpSession session) {
+    public ResponseEntity<List<GoalDetailResponseDto>> getTodayFeedGoals(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        List<FeedGoalDto> feedGoals = goalService.getTodayFeedGoals(userId);
+        List<GoalDetailResponseDto> feedGoals = goalService.getTodayFeedGoalsAsDetails(userId);
         return ResponseEntity.ok(feedGoals);
     }
+
 
     @Operation(summary = "단일 목표 상세 조회", description = "단일 목표와 그에 달린 모든 댓글을 조회합니다.")
     @ApiResponses(value = {
