@@ -132,6 +132,38 @@ public class GoalService {
                 .collect(Collectors.toList());
     }
 
+
+    @Transactional
+    public List<GoalDetailResponseDto> getTodayFeedGoalsAsDetails(Long userId) {
+        User loggedInUser = getLoggedInUser(userId); // 로그인된 사용자 가져오기
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        List<User> followingUsers = loggedInUser.getFollowingUsers(); // 팔로우한 사용자 목록 가져오기
+
+        // 오늘 날짜에 생성된 팔로우한 사용자의 목표 조회
+        return goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay)
+                .stream()
+                .map(goal -> new GoalDetailResponseDto(
+                        goal.getGoalId(),
+                        goal.getContent(),
+                        goal.getUser().getNickname(),
+                        goal.getCreatedAt(),
+                        goal.isCompleted(),
+                        goal.getComments().stream()
+                                .map(comment -> new GoalCommentResponseDto(
+                                        comment.getCommentId(),
+                                        comment.getUser().getNickname(),
+                                        comment.getContent(),
+                                        comment.getCreatedAt(),
+                                        comment.getEmoji()
+                                ))
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+    }
+
+
     // Goal ID를 기준으로 목표 상세 조회 (댓글 포함)
     @Transactional
     public Optional<GoalDetailResponseDto> getGoalDetailsWithComments(Long goalId) {
