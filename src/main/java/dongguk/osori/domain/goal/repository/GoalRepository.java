@@ -14,6 +14,8 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     Optional<Goal> findByGoalId(Long goalId);
     Optional<Goal> findByGoalIdAndUser(Long goalId, User user);
     List<Goal> findByUserInAndCreatedAtBetween(List<User> users, LocalDateTime start, LocalDateTime end);
+    List<Goal> findByUserAndCreatedAtBetween(User user, LocalDateTime start, LocalDateTime end);
+
 
 }
 

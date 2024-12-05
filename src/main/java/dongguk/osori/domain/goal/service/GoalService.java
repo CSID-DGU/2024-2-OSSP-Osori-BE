@@ -103,40 +103,16 @@ public class GoalService {
         return "목표 삭제 완료";
     }
 
-    // 피드에서 오늘 날짜의 팔로우한 사람들의 목표 조회
-    @Transactional
-    public List<FeedGoalDto> getTodayFeedGoals(Long userId) {
-        User loggedInUser = getLoggedInUser(userId);
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
-
-        List<User> followingUsers = loggedInUser.getFollowingUsers();
-
-        return goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay)
-                .stream()
-                .map(goal -> new FeedGoalDto(
-                        goal.getGoalId(),
-                        goal.getUser().getNickname(),
-                        goal.getCreatedAt(),
-                        goal.isCompleted(),
-                        goal.getContent(),
-                        goal.getComments().size()
-                ))
-                .collect(Collectors.toList());
-    }
-
     @Transactional
     public List<GoalDetailResponseDto> getTodayFeedGoalsAsDetails(Long userId) {
         User loggedInUser = getLoggedInUser(userId); // 로그인된 사용자 정보 로드
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        List<User> followingUsers = loggedInUser.getFollowingUsers();
-
-        return goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay)
-                .stream()
+        // 1. 자신의 목표 조회
+        List<Goal> myGoals = goalRepository.findByUserAndCreatedAtBetween(loggedInUser, startOfDay, endOfDay);
+        List<GoalDetailResponseDto> myGoalsDtos = myGoals.stream()
                 .map(goal -> {
-                    // 댓글 리스트 생성
                     List<GoalCommentResponseDto> comments = goal.getComments().stream()
                             .map(comment -> new GoalCommentResponseDto(
                                     comment.getCommentId(),
@@ -148,20 +124,50 @@ public class GoalService {
                             ))
                             .collect(Collectors.toList());
 
-                    // 목표 DTO 생성
                     return new GoalDetailResponseDto(
                             goal.getGoalId(),
                             goal.getContent(),
                             goal.getUser().getNickname(),
                             goal.getCreatedAt(),
                             goal.isCompleted(),
-                            goal.getUser().getUserId().equals(userId), // 목표 작성자와 로그인된 사용자 ID 비교
+                            true, // 내 목표이므로 항상 true
                             comments
                     );
                 })
                 .collect(Collectors.toList());
-    }
 
+        // 2. 팔로우한 사용자들의 목표 조회
+        List<User> followingUsers = loggedInUser.getFollowingUsers();
+        List<Goal> followingGoals = goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay);
+        List<GoalDetailResponseDto> followingGoalsDtos = followingGoals.stream()
+                .map(goal -> {
+                    List<GoalCommentResponseDto> comments = goal.getComments().stream()
+                            .map(comment -> new GoalCommentResponseDto(
+                                    comment.getCommentId(),
+                                    comment.getUser().getNickname(),
+                                    comment.getContent(),
+                                    comment.getCreatedAt(),
+                                    comment.getEmoji(),
+                                    comment.getUser().getUserId().equals(userId) // 댓글 작성자와 로그인된 사용자 ID 비교
+                            ))
+                            .collect(Collectors.toList());
+
+                    return new GoalDetailResponseDto(
+                            goal.getGoalId(),
+                            goal.getContent(),
+                            goal.getUser().getNickname(),
+                            goal.getCreatedAt(),
+                            goal.isCompleted(),
+                            false, // 팔로우한 사람의 목표이므로 false
+                            comments
+                    );
+                })
+                .collect(Collectors.toList());
+
+        // 3. 결과 리스트 생성: 자신의 목표를 먼저 추가한 후 팔로우한 사람들의 목표 추가
+        myGoalsDtos.addAll(followingGoalsDtos);
+        return myGoalsDtos;
+    }
 
     @Transactional
     public Optional<GoalDetailResponseDto> getGoalDetailsWithComments(Long goalId, Long userId) {
