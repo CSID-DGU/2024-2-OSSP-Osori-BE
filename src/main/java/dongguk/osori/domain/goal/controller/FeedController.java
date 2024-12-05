@@ -40,12 +40,22 @@ public class FeedController {
     @Operation(summary = "단일 목표 상세 조회", description = "단일 목표와 그에 달린 모든 댓글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "목표 상세 조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
             @ApiResponse(responseCode = "404", description = "목표를 찾을 수 없음")
     })
     @GetMapping("/{goalId}")
-    public ResponseEntity<GoalDetailResponseDto> getGoalDetailsWithComments(@PathVariable("goalId") Long goalId) {
-        Optional<GoalDetailResponseDto> goalDetails = goalService.getGoalDetailsWithComments(goalId);
+    public ResponseEntity<GoalDetailResponseDto> getGoalDetailsWithComments(
+            @PathVariable("goalId") Long goalId,
+            HttpSession session) {
+
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Optional<GoalDetailResponseDto> goalDetails = goalService.getGoalDetailsWithComments(goalId, userId);
         return goalDetails.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 }

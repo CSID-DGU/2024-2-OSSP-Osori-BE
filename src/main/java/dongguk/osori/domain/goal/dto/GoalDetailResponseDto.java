@@ -14,5 +14,6 @@ public class GoalDetailResponseDto {
     private String nickname;
     private LocalDateTime createdAt;
     private boolean completed;
+    private boolean isMine;
     private List<GoalCommentResponseDto> comments;
 }

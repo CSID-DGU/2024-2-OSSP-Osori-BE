@@ -26,12 +26,10 @@ public class GoalService {
 
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
-    private final GoalCommentRepository goalCommentRepository;
     private final QuestService questService;
 
     // 로그인된 사용자 가져오기
     private User getLoggedInUser(Long userId) {
-        log.debug("Fetching user with ID: {}", userId); // 디버깅용
         return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
@@ -39,7 +37,6 @@ public class GoalService {
     // 로그인된 사용자의 모든 목표 조회
     public List<GoalResponseDto> getUserGoals(Long userId) {
         User user = getLoggedInUser(userId);
-        log.debug("Goals retrieved: {}", user.getGoals()); // 디버깅용
         return user.getGoals().stream()
                 .map(goal -> new GoalResponseDto(goal.getGoalId(), goal.getContent(), goal.getCreatedAt(), goal.isCompleted()))
                 .collect(Collectors.toList());
@@ -93,81 +90,28 @@ public class GoalService {
     // 목표 삭제
     @Transactional
     public String deleteGoal(Long userId, Long goalId) {
-        log.debug("Deleting goal ID: {} for user ID: {}", goalId, userId); // 디버깅용
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 목표"));
 
         User user = getLoggedInUser(userId);
-        log.debug("User found: {}, Goal user: {}", user, goal.getUser()); // 디버깅용
 
         if(!user.equals(goal.getUser())) {
             log.warn("User mismatch: {} is not the owner of goal ID: {}", userId, goalId); // 디버깅용
             return "잘못된 사용자, 삭제 실패";
         }
-        goalRepository.deleteById(goalId); // Goal에서 목표 삭제
-        log.debug("Goal deleted successfully: {}", goalId); // 디버깅용
+        goalRepository.deleteById(goalId);
         return "목표 삭제 완료";
     }
 
-    // 피드에서 오늘 날짜의 팔로우한 사람들의 목표 조회
-    @Transactional
-    public List<FeedGoalDto> getTodayFeedGoals(Long userId) {
-        User loggedInUser = getLoggedInUser(userId); // 로그인된 사용자 가져오기
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
-
-        List<User> followingUsers = loggedInUser.getFollowingUsers(); // 팔로우한 사용자 목록 가져오기
-
-        // 오늘 날짜에 생성된 팔로우한 사용자의 목표 조회
-        return goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay)
-                .stream()
-                .map(goal -> new FeedGoalDto(
-                        goal.getGoalId(),
-                        goal.getUser().getNickname(),
-                        goal.getCreatedAt(),
-                        goal.isCompleted(),
-                        goal.getContent(),
-                        goal.getComments().size()
-                ))
-                .collect(Collectors.toList());
-    }
-
-
     @Transactional
     public List<GoalDetailResponseDto> getTodayFeedGoalsAsDetails(Long userId) {
-        User loggedInUser = getLoggedInUser(userId); // 로그인된 사용자 가져오기
+        User loggedInUser = getLoggedInUser(userId); // 로그인된 사용자 정보 로드
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-        List<User> followingUsers = loggedInUser.getFollowingUsers(); // 팔로우한 사용자 목록 가져오기
-
-        // 오늘 날짜에 생성된 팔로우한 사용자의 목표 조회
-        return goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay)
-                .stream()
-                .map(goal -> new GoalDetailResponseDto(
-                        goal.getGoalId(),
-                        goal.getContent(),
-                        goal.getUser().getNickname(),
-                        goal.getCreatedAt(),
-                        goal.isCompleted(),
-                        goal.getComments().stream()
-                                .map(comment -> new GoalCommentResponseDto(
-                                        comment.getCommentId(),
-                                        comment.getUser().getNickname(),
-                                        comment.getContent(),
-                                        comment.getCreatedAt(),
-                                        comment.getEmoji()
-                                ))
-                                .collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
-    }
-
-
-    // Goal ID를 기준으로 목표 상세 조회 (댓글 포함)
-    @Transactional
-    public Optional<GoalDetailResponseDto> getGoalDetailsWithComments(Long goalId) {
-        return goalRepository.findById(goalId)
+        // 1. 자신의 목표 조회
+        List<Goal> myGoals = goalRepository.findByUserAndCreatedAtBetween(loggedInUser, startOfDay, endOfDay);
+        List<GoalDetailResponseDto> myGoalsDtos = myGoals.stream()
                 .map(goal -> {
                     List<GoalCommentResponseDto> comments = goal.getComments().stream()
                             .map(comment -> new GoalCommentResponseDto(
@@ -175,7 +119,8 @@ public class GoalService {
                                     comment.getUser().getNickname(),
                                     comment.getContent(),
                                     comment.getCreatedAt(),
-                                    comment.getEmoji()
+                                    comment.getEmoji(),
+                                    comment.getUser().getUserId().equals(userId) // 댓글 작성자와 로그인된 사용자 ID 비교
                             ))
                             .collect(Collectors.toList());
 
@@ -185,8 +130,75 @@ public class GoalService {
                             goal.getUser().getNickname(),
                             goal.getCreatedAt(),
                             goal.isCompleted(),
+                            true, // 내 목표이므로 항상 true
+                            comments
+                    );
+                })
+                .collect(Collectors.toList());
+
+        // 2. 팔로우한 사용자들의 목표 조회
+        List<User> followingUsers = loggedInUser.getFollowingUsers();
+        List<Goal> followingGoals = goalRepository.findByUserInAndCreatedAtBetween(followingUsers, startOfDay, endOfDay);
+        List<GoalDetailResponseDto> followingGoalsDtos = followingGoals.stream()
+                .map(goal -> {
+                    List<GoalCommentResponseDto> comments = goal.getComments().stream()
+                            .map(comment -> new GoalCommentResponseDto(
+                                    comment.getCommentId(),
+                                    comment.getUser().getNickname(),
+                                    comment.getContent(),
+                                    comment.getCreatedAt(),
+                                    comment.getEmoji(),
+                                    comment.getUser().getUserId().equals(userId) // 댓글 작성자와 로그인된 사용자 ID 비교
+                            ))
+                            .collect(Collectors.toList());
+
+                    return new GoalDetailResponseDto(
+                            goal.getGoalId(),
+                            goal.getContent(),
+                            goal.getUser().getNickname(),
+                            goal.getCreatedAt(),
+                            goal.isCompleted(),
+                            false, // 팔로우한 사람의 목표이므로 false
+                            comments
+                    );
+                })
+                .collect(Collectors.toList());
+
+        // 3. 결과 리스트 생성: 자신의 목표를 먼저 추가한 후 팔로우한 사람들의 목표 추가
+        myGoalsDtos.addAll(followingGoalsDtos);
+        return myGoalsDtos;
+    }
+
+    @Transactional
+    public Optional<GoalDetailResponseDto> getGoalDetailsWithComments(Long goalId, Long userId) {
+        User loggedInUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return goalRepository.findById(goalId)
+                .map(goal -> {
+                    // 댓글 리스트 생성
+                    List<GoalCommentResponseDto> comments = goal.getComments().stream()
+                            .map(comment -> new GoalCommentResponseDto(
+                                    comment.getCommentId(),
+                                    comment.getUser().getNickname(),
+                                    comment.getContent(),
+                                    comment.getCreatedAt(),
+                                    comment.getEmoji(),
+                                    comment.getUser().getUserId().equals(userId) // 작성자와 로그인된 사용자 비교
+                            ))
+                            .collect(Collectors.toList());
+
+                    // 목표 생성
+                    return new GoalDetailResponseDto(
+                            goal.getGoalId(),
+                            goal.getContent(),
+                            goal.getUser().getNickname(),
+                            goal.getCreatedAt(),
+                            goal.isCompleted(),
+                            goal.getUser().getUserId().equals(userId), // 목표 작성자와 로그인된 사용자 비교
                             comments
                     );
                 });
     }
+
 }
