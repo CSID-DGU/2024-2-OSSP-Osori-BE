@@ -49,20 +49,22 @@ public class GoalCommentService {
 
         questService.updateMissionStatus(userId, MissionType.COMMENTED_ON_FRIEND_GOAL);
 
-
         return new GoalCommentResponseDto(
                 comment.getCommentId(),
                 user.getNickname(),
                 comment.getContent(),
                 comment.getCreatedAt(),
-                comment.getEmoji()
+                comment.getEmoji(),
+                true // 댓글 작성자는 로그인된 사용자이므로 항상 true
         );
     }
 
-
     // 댓글 조회
     @Transactional
-    public Optional<GoalDetailResponseDto> getGoalDetailsWithComments(Long goalId) {
+    public Optional<GoalDetailResponseDto> getGoalDetailsWithComments(Long goalId, Long userId) {
+        User loggedInUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return goalRepository.findById(goalId)
                 .map(goal -> {
                     List<GoalCommentResponseDto> comments = goal.getComments().stream()
@@ -71,7 +73,8 @@ public class GoalCommentService {
                                     comment.getUser().getNickname(),
                                     comment.getContent(),
                                     comment.getCreatedAt(),
-                                    comment.getEmoji()
+                                    comment.getEmoji(),
+                                    comment.getUser().equals(loggedInUser) // 댓글 작성자와 로그인된 사용자 비교
                             ))
                             .collect(Collectors.toList());
 
@@ -81,11 +84,11 @@ public class GoalCommentService {
                             goal.getUser().getNickname(),
                             goal.getCreatedAt(),
                             goal.isCompleted(),
+                            goal.getUser().equals(loggedInUser), // 목표 작성자와 로그인된 사용자 비교
                             comments
                     );
                 });
     }
-
 
     // 댓글 삭제
     @Transactional
@@ -100,3 +103,4 @@ public class GoalCommentService {
         goalCommentRepository.deleteById(commentId);
     }
 }
+

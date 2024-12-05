@@ -50,10 +50,13 @@ public class GoalController {
         if (userId == null) {
             return ResponseEntity.status(401).build();
         }
-        Optional<GoalDetailResponseDto> goalDetail = goalService.getGoalDetailsWithComments(goalId);
+
+        // isMine
+        Optional<GoalDetailResponseDto> goalDetail = goalService.getGoalDetailsWithComments(goalId, userId);
         return goalDetail.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
 
     @Operation(summary = "로그인한 사용자의 목표 생성", description = "로그인한 사용자의 새로운 목표를 생성합니다.")

@@ -13,5 +13,6 @@ public class GoalCommentResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private int emoji;
+    private boolean isMine;
 }
 
