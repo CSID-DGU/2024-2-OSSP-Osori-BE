@@ -68,7 +68,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://2024-2-oss-proj-osori-fe.vercel.app", "https://osori.store"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://2024-2-oss-proj-osori-fe.vercel.app", "https://www.osori.store"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
