@@ -15,9 +15,9 @@ public class SwaggerConfig implements WebMvcConfigurer {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("DuoBloom API")
+                        .title("Akoming API")
                         .version("1.0.0")
-                        .description("DuoBloom API 문서")
+                        .description("아코밍 API 문서")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }
 
